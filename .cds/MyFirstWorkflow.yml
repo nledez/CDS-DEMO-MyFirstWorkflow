@@ -1,0 +1,39 @@
+name: MyFirstWorkflow
+version: v1.0
+template: shared.infra/demo-workflow-hello-world
+workflow:
+  build:
+    pipeline: build-1
+    application: MyFirstWorkflow
+  deploy-dev:
+    depends_on:
+    - build
+    pipeline: deploy-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-dev
+  deploy-preprod:
+    depends_on:
+    - fork
+    when:
+    - success
+    pipeline: deploy-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-preprod
+  deploy-prod:
+    depends_on:
+    - fork
+    when:
+    - manual
+    - success
+    pipeline: deploy-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-prod
+  fork:
+    depends_on:
+    - it-dev
+  it-dev:
+    depends_on:
+    - deploy-dev
+    pipeline: it-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-dev
