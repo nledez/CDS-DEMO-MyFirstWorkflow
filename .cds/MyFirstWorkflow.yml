@@ -31,7 +31,7 @@ workflow:
   fork:
     depends_on:
     - it-dev
-  it-dev:
+  interation-tests-dev:
     depends_on:
     - deploy-dev
     pipeline: it-1
