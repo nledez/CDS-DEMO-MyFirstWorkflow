@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"log"
@@ -14,6 +15,7 @@ func main() {
 	var r = mux.NewRouter()
 	//r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/welcome", rootHandler).Name("welcome")
+	r.HandleFunc("/status", statusHandler).Name("status")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./data/")))
 
 	http.Handle("/", errorChain.Then(r))
@@ -32,6 +34,10 @@ func main() {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	//render("./data/index.html", w, r)
+}
+
+func statusHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "UP")
 }
 
 func loggerHandler(h http.Handler) http.Handler {
