@@ -1,7 +1,11 @@
 FROM ubuntu:bionic
 
-COPY server /usr/local/bin/server
+RUN mkdir /app /app/data
+WORKDIR /app
+
+COPY server ./
+COPY data/ ./data/
 
 EXPOSE 8080
 
-CMD /usr/local/bin/server
+CMD ./server
