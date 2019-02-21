@@ -7,3 +7,5 @@ go get github.com/justinas/alice
 sed "s/%date%/${1}/;s/%id%/${2}/" data/index.in > data/index.html
 
 go build -o server .
+
+tar cvzf server.tgz server data/*.html data/*.txt
