@@ -4,7 +4,11 @@ set -e
 go get github.com/gorilla/mux
 go get github.com/justinas/alice
 
-sed "s/%date%/${1}/;s/%id%/${2}/" data/index.in > data/index.html
+if [ ! -f data/date.txt ]; then
+	echo "Fake date" > data/date.txt
+fi
+
+sed "s/%date%/$(cat data/date.txt)/;s/%id%/${1:-0}/" data/index.in > data/index.html
 
 go build -o server .
 
