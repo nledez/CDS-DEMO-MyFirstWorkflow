@@ -1,3 +1,7 @@
 server
 data/index.html
 server.tgz
+coverage.html
+coverage.out
+report.xml
+test.log
