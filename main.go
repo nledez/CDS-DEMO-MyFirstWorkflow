@@ -6,6 +6,7 @@ import (
 	"github.com/justinas/alice"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -37,7 +38,11 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "UP")
+	name, err := os.Hostname()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprintf(w, "UP on "+name)
 }
 
 func loggerHandler(h http.Handler) http.Handler {
