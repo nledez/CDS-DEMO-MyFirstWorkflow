@@ -11,7 +11,7 @@ import (
 
 func Router() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/status", statusHandler).Methods("GET")
+	router.HandleFunc("/status2", statusHandler).Methods("GET")
 	return router
 }
 

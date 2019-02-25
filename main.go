@@ -16,7 +16,7 @@ func main() {
 	var r = mux.NewRouter()
 	//r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/welcome", rootHandler).Name("welcome")
-	r.HandleFunc("/status2", statusHandler).Name("status")
+	r.HandleFunc("/status", statusHandler).Name("status")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./data/")))
 
 	http.Handle("/", errorChain.Then(r))
