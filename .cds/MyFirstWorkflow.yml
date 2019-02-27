@@ -30,7 +30,7 @@ workflow:
     environment: MyFirstWorkflow-prod
   fork:
     depends_on:
-    - it-1
+    - interation-tests-dev
   interation-tests-dev:
     depends_on:
     - deploy-dev
