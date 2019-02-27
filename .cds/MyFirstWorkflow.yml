@@ -1,39 +1,72 @@
 name: MyFirstWorkflow
 version: v1.0
-template: shared.infra/demo-workflow-hello-world
 workflow:
   build:
     pipeline: build-1
     application: MyFirstWorkflow
+    payload:
+      git.author: ""
+      git.branch: master
+      git.hash: ""
+      git.hash.before: ""
+      git.message: ""
+      git.repository: nledez-demo/CDS-DEMO-MyFirstWorkflow
+      git.tag: ""
   deploy-dev:
     depends_on:
     - build
     pipeline: deploy-1
     application: MyFirstWorkflow
     environment: MyFirstWorkflow-dev
-  deploy-preprod:
+  deploy-prod:
     depends_on:
-    - fork
+    - deploy-stg
+    when:
+    - success
+    - manual
+    pipeline: deploy-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-prod
+  deploy-stg:
+    depends_on:
+    - join
     when:
     - success
     pipeline: deploy-1
     application: MyFirstWorkflow
     environment: MyFirstWorkflow-preprod
-  deploy-prod:
-    depends_on:
-    - fork
-    when:
-    - manual
-    - success
-    pipeline: deploy-1
-    application: MyFirstWorkflow
-    environment: MyFirstWorkflow-prod
-  fork:
-    depends_on:
-    - interation-tests-dev
-  interation-tests-dev:
+  it-1:
     depends_on:
     - deploy-dev
+    when:
+    - success
     pipeline: it-1
     application: MyFirstWorkflow
     environment: MyFirstWorkflow-dev
+  join:
+    depends_on:
+    - it-1
+    - test
+    conditions:
+      check:
+      - variable: workflow.it-1.status
+        operator: eq
+        value: Success
+      - variable: workflow.test.status
+        operator: eq
+        value: Success
+  test:
+    depends_on:
+    - build
+    when:
+    - success
+    pipeline: test-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-dev
+hooks:
+  build:
+  - type: RepositoryWebHook
+    ref: "1550697429"
+metadata:
+  default_tags: git.branch,git.author
+

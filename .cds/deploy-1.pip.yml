@@ -1,10 +1,27 @@
 version: v1.0
 name: deploy-1
-stages:
-- deploy
+parameters:
+  environment:
+    type: string
 jobs:
 - job: deploy
-  stage: deploy
   steps:
   - script:
     - echo "Deploying my application at {{.cds.env.url}}"
+  - script:
+    - '#!/bin/bash'
+    - SERVICE_NAME="demo-{{.cds.env.docker_shortname}}_server"
+    - OLD_REPLICAT_NUMBER=$(docker service inspect ${SERVICE_NAME} | jq '.[].Spec.Mode.Replicated.Replicas')
+    - NEW_REPLICAT_NUMBER=$(expr ${OLD_REPLICAT_NUMBER} * 2)
+    - ""
+    - docker pull 127.0.0.1:5000/demo:{{.cds.version}}
+    - docker tag 127.0.0.1:5000/demo:{{.cds.version}} 127.0.0.1:5000/demo:{{.cds.env.docker_shortname}}
+    - docker push 127.0.0.1:5000/demo:{{.cds.env.docker_shortname}}
+    - ""
+    - docker service scale ${SERVICE_NAME}=${NEW_REPLICAT_NUMBER}
+    - ""
+    - '#docker service update --quiet ${SERVICE_NAME} --image 127.0.0.1:5000/demo:{{.cds.version}}'
+    - ""
+    - docker service scale ${SERVICE_NAME}=${OLD_REPLICAT_NUMBER}
+  requirements:
+  - binary: docker

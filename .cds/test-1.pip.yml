@@ -1,0 +1,21 @@
+version: v1.0
+name: test-1
+jobs:
+- job: Test it
+  steps:
+  - gitClone:
+      branch: '{{.git.branch}}'
+      commit: '{{.git.hash}}'
+      directory: '{{.cds.workspace}}'
+      privateKey: proj-ssh-demo
+      url: '{{.git.url}}'
+  - script:
+    - ./make_test.sh
+    - ls -lrt
+  - jUnitReport: '*.xml'
+  - artifactUpload:
+      path: coverage.html
+      tag: '{{.cds.version}}'
+  requirements:
+  - binary: git
+  - binary: go

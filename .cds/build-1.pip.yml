@@ -9,8 +9,49 @@ jobs:
   steps:
   - script:
     - echo "Building my application"
+  - gitClone:
+      branch: '{{.git.branch}}'
+      commit: '{{.git.hash}}'
+      directory: '{{.cds.workspace}}'
+      privateKey: proj-ssh-demo
+      url: '{{.git.url}}'
+  - script:
+    - ./build.sh "{{.cds.version}}"
+  - artifactUpload:
+      path: ./server.tgz
+      tag: '{{.cds.version}}'
+  requirements:
+  - binary: git
+  - binary: go
 - job: package
   stage: package
   steps:
   - script:
     - echo "Packaging my application"
+    - echo "======="
+    - pwd
+    - ls -lrt
+    - echo "======="
+  - gitClone:
+      branch: '{{.git.branch}}'
+      commit: '{{.git.hash}}'
+      directory: '{{.cds.workspace}}'
+      privateKey: proj-ssh-demo
+      url: '{{.git.url}}'
+  - artifactDownload:
+      application: '{{.cds.application}}'
+      path: ./
+      pattern: server.tgz
+      pipeline: '{{.cds.pipeline}}'
+      tag: '{{.cds.version}}'
+  - script:
+    - tar xvzf server.tgz
+    - echo "======="
+    - pwd
+    - ls -lrt
+    - echo "======="
+    - docker build --tag 127.0.0.1:5000/demo:{{.cds.version}} .
+    - docker push 127.0.0.1:5000/demo:{{.cds.version}}
+  requirements:
+  - binary: docker
+  - binary: git
