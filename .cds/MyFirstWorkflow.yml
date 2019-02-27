@@ -12,12 +12,48 @@ workflow:
       git.message: ""
       git.repository: nledez-demo/CDS-DEMO-MyFirstWorkflow
       git.tag: ""
+  integration-tests-dev:
+    depends_on:
+    - deploy-dev
+    when:
+    - success
+    pipeline: it-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-dev
   deploy-dev:
     depends_on:
     - build
+    when:
+    - success
     pipeline: deploy-1
     application: MyFirstWorkflow
     environment: MyFirstWorkflow-dev
+  unit-tests:
+    depends_on:
+    - build
+    pipeline: test-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-dev
+  join:
+    depends_on:
+    - integration-tests-dev
+    - unit-tests
+    conditions:
+      check:
+      - variable: workflow.integration-tests-dev.status
+        operator: eq
+        value: Success
+      - variable: workflow.unit-tests.status
+        operator: eq
+        value: Success
+  deploy-stg:
+    depends_on:
+    - join
+    when:
+    - success
+    pipeline: deploy-1
+    application: MyFirstWorkflow
+    environment: MyFirstWorkflow-preprod
   deploy-prod:
     depends_on:
     - deploy-stg
@@ -27,46 +63,9 @@ workflow:
     pipeline: deploy-1
     application: MyFirstWorkflow
     environment: MyFirstWorkflow-prod
-  deploy-stg:
-    depends_on:
-    - join
-    when:
-    - success
-    pipeline: deploy-1
-    application: MyFirstWorkflow
-    environment: MyFirstWorkflow-preprod
-  it-1:
-    depends_on:
-    - deploy-dev
-    when:
-    - success
-    pipeline: it-1
-    application: MyFirstWorkflow
-    environment: MyFirstWorkflow-dev
-  join:
-    depends_on:
-    - it-1
-    - test
-    conditions:
-      check:
-      - variable: workflow.it-1.status
-        operator: eq
-        value: Success
-      - variable: workflow.test.status
-        operator: eq
-        value: Success
-  test:
-    depends_on:
-    - build
-    when:
-    - success
-    pipeline: test-1
-    application: MyFirstWorkflow
-    environment: MyFirstWorkflow-dev
 hooks:
   build:
   - type: RepositoryWebHook
     ref: "1550697429"
 metadata:
   default_tags: git.branch,git.author
-
