@@ -13,4 +13,4 @@ wget -O data/jquery.js https://code.jquery.com/jquery-3.3.1.min.js
 
 go build -o server .
 
-tar cvzf server.tgz server data/*.html data/*.txt
+tar cvzf server.tgz server data/*.html data/*.js data/*.css data/*.txt

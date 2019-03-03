@@ -1,0 +1,12 @@
+div.content {
+}
+div.home {
+  border: black 1px solid;
+  width: 250px;
+  height: 60px;
+}
+div.status {
+  position: relative;
+  top: -62px;
+  left: 260px;
+}
