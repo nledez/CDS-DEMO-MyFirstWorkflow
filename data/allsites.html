@@ -1,17 +1,86 @@
 <html>
+	<head>
+    <script src="jquery.js"></script>
+	</head>
   <body>
+    <div>
     <a href="https://demo-dev.tools.cg-wire.com/">Dev</a>:<br/>
-    <iframe src="https://demo-dev.tools.cg-wire.com/"></iframe>
-    <iframe src="https://demo-dev.tools.cg-wire.com/status"></iframe>
-    <br/>
-    <br/>
+    </div>
+    <div id="dev_home" class="content home"></div>
+    <div id="dev_status" class="content status"></div>
+    <div>
     <a href="https://demo-stg.tools.cg-wire.com/">Staging</a>:<br/>
-    <iframe src="https://demo-stg.tools.cg-wire.com/"></iframe>
-    <iframe src="https://demo-stg.tools.cg-wire.com/status"></iframe>
-    <br/>
-    <br/>
+    </div>
+    <div id="stg_home" class="content home"></div>
+    <div id="stg_status" class="content status"></div>
+    <div>
     <a href="https://demo-prod.tools.cg-wire.com/">Prod</a>:<br/>
-    <iframe src="https://demo-prod.tools.cg-wire.com/"></iframe>
-    <iframe src="https://demo-prod.tools.cg-wire.com/status"></iframe>
+    </div>
+    <div id="prod_home" class="content home"></div>
+    <div id="prod_status" class="content status"></div>
   </body>
+  <script type="text/javascript">
+var get_params = function(search_string) {
+
+  var parse = function(params, pairs) {
+    var pair = pairs[0];
+    var parts = pair.split('=');
+    var key = decodeURIComponent(parts[0]);
+    var value = decodeURIComponent(parts.slice(1).join('='));
+
+    // Handle multiple parameters of the same name
+    if (typeof params[key] === "undefined") {
+      params[key] = value;
+    } else {
+      params[key] = [].concat(params[key], value);
+    }
+
+    return pairs.length == 1 ? params : parse(params, pairs.slice(1))
+  }
+
+  // Get rid of leading ?
+  return search_string.length == 0 ? {} : parse({}, search_string.substr(1).split('&'));
+}
+
+    var params = get_params(location.search);
+
+    var rh = params['rh'];
+    var rs = params['rs'];
+
+    if (rh == null){ rh = 2000 };
+    if (rs == null){ rs = 2000 };
+
+    console.log('Set home refresh delay: ' + rh);
+    console.log('Set status refresh delay: ' + rs);
+
+    reloadContentHome();
+    reloadContentStatus();
+    window.setInterval("reloadContentHome();", rh);
+    window.setInterval("reloadContentStatus();", rs);
+
+function reloadContentHome() {
+	$("#dev_home").load("https://demo-dev.tools.cg-wire.com/");
+  $("#stg_home").load("https://demo-stg.tools.cg-wire.com/");
+  $("#prod_home").load("https://demo-prod.tools.cg-wire.com/");
+}
+function reloadContentStatus() {
+  $("#dev_status").load("https://demo-dev.tools.cg-wire.com/status");
+  $("#stg_status").load("https://demo-stg.tools.cg-wire.com/status");
+  $("#prod_status").load("https://demo-prod.tools.cg-wire.com/status");
+}
+  </script>
+  <style>
+div.content {
+}
+div.home {
+  border: black 1px solid;
+  width: 250px;
+  height: 60px;
+}
+div.status {
+  position: relative;
+  top: -62px;
+  left: 260px;
+}
+  </style>
 </html>

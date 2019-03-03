@@ -5,3 +5,4 @@ coverage.html
 coverage.out
 report.xml
 test.log
+data/jquery.js

@@ -9,6 +9,7 @@ if [ ! -f data/date.txt ]; then
 fi
 
 sed "s/%date%/$(cat data/date.txt)/;s/%id%/${1:-0}/" data/index.in > data/index.html
+wget -O data/jquery.js https://code.jquery.com/jquery-3.3.1.min.js
 
 go build -o server .
 
