@@ -14,10 +14,8 @@ func main() {
 	errorChain := alice.New(loggerHandler, recoverHandler)
 
 	var r = mux.NewRouter()
-	//r.HandleFunc("/", rootHandler)
-	r.HandleFunc("/welcome", rootHandler).Name("welcome")
 	r.HandleFunc("/status", statusHandler).Name("status")
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./data/")))
+	r.PathPrefix("/").Handler(changeHeaderThenServe(http.FileServer(http.Dir("./data/"))))
 
 	http.Handle("/", errorChain.Then(r))
 
@@ -33,11 +31,15 @@ func main() {
 	}
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	//render("./data/index.html", w, r)
+func changeHeaderThenServe(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Set some header.
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		// Serve with the actual handler.
+		h.ServeHTTP(w, r)
+	}
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
