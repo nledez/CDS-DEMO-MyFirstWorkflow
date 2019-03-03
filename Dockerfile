@@ -4,7 +4,7 @@ RUN mkdir /app /app/data
 WORKDIR /app
 
 COPY server ./
-COPY data/*.html data/*.txt ./data/
+COPY data/*.html data/*.js data/*.txt ./data/
 
 EXPOSE 8080
 
