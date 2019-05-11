@@ -1,0 +1,10 @@
+language: go
+
+services:
+  - docker
+
+go:
+- 1.11.4
+
+script:
+  - ./build.sh $TRAVIS_BUILD_NUMBER
