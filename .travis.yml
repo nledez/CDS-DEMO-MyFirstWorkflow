@@ -8,3 +8,8 @@ go:
 
 script:
   - ./build.sh $TRAVIS_BUILD_NUMBER
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build --tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER .
+  - docker tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER nledez/test_ci_cd:latest
+  - docker push nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER
+  - docker push nledez/test_ci_cd:latest
