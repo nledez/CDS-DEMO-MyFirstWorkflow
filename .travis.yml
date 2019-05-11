@@ -6,10 +6,27 @@ services:
 go:
 - 1.11.4
 
-script:
-  - ./build.sh $TRAVIS_BUILD_NUMBER
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build --tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER .
-  - docker tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER nledez/test_ci_cd:latest
-  - docker push nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER
-  - docker push nledez/test_ci_cd:latest
+jobs:
+  include:
+    - stage: test
+      script:
+        - ./make_test.sh
+        - ls -lrt
+    - stage: build
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - ./build.sh $TRAVIS_BUILD_NUMBER
+        - docker build --tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER .
+        - docker images
+        - docker container run --name demo -d --rm -p 8080:8080 nledez/test_ci_cd:latest
+        - curl -v http://127.0.0.1:8080/
+        - curl -v http://127.0.0.1:8080/status
+        - docker push nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER
+    - stage: push_to_docker_hub
+      if: branch = master
+      script:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker pull nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER
+        - docker tag nledez/test_ci_cd:$TRAVIS_BUILD_NUMBER nledez/test_ci_cd:latest
+        - docker images
+        - docker push nledez/test_ci_cd:latest
